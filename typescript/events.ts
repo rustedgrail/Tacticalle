@@ -17,30 +17,28 @@ var keyBindings = {
     
 }
 function handleKeyPress(e) {
-    console.log(e);    
-    if (typeof keyBindings[e.keyCode] === 'function') RAF(keyBindings[e.keyCode].bind(e))
+    //console.log(e);    
+    if (typeof keyBindings[e.keyCode] === 'function') handleKeyEvent(e)
 }
 
-function moveLeft() {
-    char.x = Math.max(0, char.x - 50)
-    drawBackground()
-    drawFigures(char)
+function handleKeyEvent(e) {
+    var board = window.Tacticalle.board
+    var char = board.currentChar();
+    RAF(keyBindings[e.keyCode].bind(null, char, e))
 }
-function moveRight() {
-    char.x = Math.min(1200, char.x + 50)
-    drawBackground()
-    drawFigures(char)
+
+function moveChar(char: Character, modX: number, modY: number) {
+    var board = window.Tacticalle.board
+    char.x = Math.max(0, Math.min(board.width, char.x + modX))
+    char.y = Math.max(0, Math.min(board.height, char.y + modY))
+    board.drawBackground()
+    board.drawFigure(char)
 }
-function moveUp() {
-    char.y = Math.max(200, char.y - 50)
-    drawBackground()
-    drawFigures(char)
-}
-function moveDown() {
-    char.y = Math.min(600, char.y + 50)
-    drawBackground()
-    drawFigures(char)
-}
+
+function moveLeft(char: Character) { moveChar(char, -1, 0) }
+function moveRight(char: Character) { moveChar(char, 1, 0) }
+function moveUp(char: Character) { moveChar(char, 0, -1) }
+function moveDown(char: Character) { moveChar(char, 0, 1) }
 function wait() {}
 function attack() {}
 function skill() {}

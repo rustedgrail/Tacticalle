@@ -16,30 +16,35 @@ var keyBindings = {
     87: wait
 };
 function handleKeyPress(e) {
-    console.log(e);
     if (typeof keyBindings[e.keyCode] === 'function')
-        RAF(keyBindings[e.keyCode].bind(e));
+        handleKeyEvent(e);
 }
 
-function moveLeft() {
-    char.x = Math.max(0, char.x - 50);
-    drawBackground();
-    drawFigures(char);
+function handleKeyEvent(e) {
+    var board = window.Tacticalle.board;
+    var char = board.currentChar();
+    RAF(keyBindings[e.keyCode].bind(null, char, e));
 }
-function moveRight() {
-    char.x = Math.min(1200, char.x + 50);
-    drawBackground();
-    drawFigures(char);
+
+function moveChar(char, modX, modY) {
+    var board = window.Tacticalle.board;
+    char.x = Math.max(0, Math.min(board.width, char.x + modX));
+    char.y = Math.max(0, Math.min(board.height, char.y + modY));
+    board.drawBackground();
+    board.drawFigure(char);
 }
-function moveUp() {
-    char.y = Math.max(200, char.y - 50);
-    drawBackground();
-    drawFigures(char);
+
+function moveLeft(char) {
+    moveChar(char, -1, 0);
 }
-function moveDown() {
-    char.y = Math.min(600, char.y + 50);
-    drawBackground();
-    drawFigures(char);
+function moveRight(char) {
+    moveChar(char, 1, 0);
+}
+function moveUp(char) {
+    moveChar(char, 0, -1);
+}
+function moveDown(char) {
+    moveChar(char, 0, 1);
 }
 function wait() {
 }
@@ -57,25 +62,64 @@ var Character = (function () {
     function Character(x, y) {
         this.x = x;
         this.y = y;
+        this.actionPoints = 0;
     }
+    Character.prototype.nextRound = function () {
+        this.actionPoints += this.speed;
+    };
     return Character;
 })();
 
-var char = new Character(50, 250);
+var Board = (function () {
+    function Board() {
+        this.chars = [];
+        this.width = 1200 / 50 - 1;
+        this.height = (600 - 200) / 50 - 1;
+    }
+    Board.prototype.addChar = function (newChar) {
+        this.chars.push(newChar);
+    };
+    Board.prototype.sortChars = function () {
+        this.chars.sort(function (a, b) {
+            return a.actionPoints - b.actionPoints;
+        });
+    };
+    Board.prototype.currentChar = function () {
+        return this.chars[0];
+    };
+    Board.prototype.getChars = function () {
+        this.sortChars();
+        return this.chars;
+    };
 
-drawBackground();
-drawFigures(char);
-attachEvents();
+    Board.prototype.drawFigure = function (currentChar) {
+        CONTEXT.fillStyle = 'black';
+        CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50);
+    };
 
-function drawBackground() {
-    CONTEXT.fillStyle = 'blue';
-    CONTEXT.fillRect(0, 0, 1200, 200);
-    CONTEXT.fillStyle = 'green';
-    CONTEXT.fillRect(0, 200, 1200, 400);
-}
+    Board.prototype.drawFigures = function () {
+        this.drawBackground();
+        this.chars.forEach(this.drawFigure);
+    };
 
-function drawFigures(currentChar) {
-    CONTEXT.fillStyle = 'black';
-    CONTEXT.fillRect(currentChar.x, currentChar.y, 50, 50);
+    Board.prototype.drawBackground = function () {
+        CONTEXT.fillStyle = 'blue';
+        CONTEXT.fillRect(0, 0, 1200, 200);
+        CONTEXT.fillStyle = 'green';
+        CONTEXT.fillRect(0, 200, 1200, 400);
+    };
+    return Board;
+})();
+
+initializeBoard();
+
+function initializeBoard() {
+    window.Tacticalle = {};
+    var char = new Character(1, 1);
+    var board = new Board();
+    window.Tacticalle.board = board;
+    board.addChar(char);
+    board.drawFigures();
+    attachEvents();
 }
 //# sourceMappingURL=tacticalle.js.map
