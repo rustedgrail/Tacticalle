@@ -19,7 +19,7 @@ class Character {
     public actionPoints: number
     
     constructor(public x: number, public y: number) {
-        this.actionPoints = 0    
+        this.actionPoints = 100
     }
     
     nextRound() {
@@ -38,7 +38,6 @@ class Board {
         this.chars.sort(function(a, b) {
             return b.actionPoints - a.actionPoints
         })
-        console.log(this.chars)
     }
     currentChar() {
         return this.chars[0]
@@ -49,21 +48,37 @@ class Board {
     }
     
     nextAction() {
-        this.chars.forEach(function(currentChar: Character) {
-            currentChar.nextRound()
-        })
-        this.sortChars()
+        while (this.chars[0].actionPoints < 100) {
+            this.chars.forEach(function(currentChar: Character) {
+                currentChar.nextRound()
+            })
+            this.sortChars()
+        }
+        this.drawFigures()
     }
     
-    isValid(x, y) {
+    getMoveCost(x, y) {
         var takenByChar = this.chars.some(function(currentChar) {
             return currentChar.x === x && currentChar.y === y
         })
-        return !takenByChar && x >= 0 && x < this.width && y >= 0 && y < this.height
+        if (takenByChar ||
+            x < 0 || x > this.width ||
+            y < 0 || y > this.height)
+        {
+            return Number.POSITIVE_INFINITY
+        }
+        else {
+            return 10;
+        }
     }
     
-    drawFigure(currentChar: Character) {
-        CONTEXT.fillStyle = 'black'
+    drawFigure(currentChar: Character, index: number) {
+        if (index) {
+            CONTEXT.fillStyle = 'black'
+        }
+        else {
+            CONTEXT.fillStyle = 'red'
+        }
         CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50)
     }
     

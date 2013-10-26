@@ -29,9 +29,11 @@ function handleKeyEvent(e) {
 
 function moveChar(char: Character, modX: number, modY: number) {
     var board = window.Tacticalle.board
-    if (board.isValid(char.x + modX, char.y + modY)) {
+    var cost = board.getMoveCost(char.x + modX, char.y + modY)
+    if (char.actionPoints >= cost) {
         char.x += modX
         char.y += modY
+        char.actionPoints -= cost
         board.drawFigures()
     }
 }
@@ -41,9 +43,15 @@ function moveRight(char: Character) { moveChar(char, 1, 0) }
 function moveUp(char: Character) { moveChar(char, 0, -1) }
 function moveDown(char: Character) { moveChar(char, 0, 1) }
 function wait(char: Character) {
-    char.actionPoints -= 10
-    window.Tacticalle.board.nextAction()
+    if (char.actionPoints < 90) {
+        window.Tacticalle.board.nextAction()
+    }
+    else {
+        console.log("Can't wait while your action points are greater than 90! ", char.actionPoints)
+    }
 }
 function attack() {}
 function skill() {}
-function defend() {}
+function defend(char: Character) {
+    char.actionPoints -= 10
+}

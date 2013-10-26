@@ -28,9 +28,11 @@ function handleKeyEvent(e) {
 
 function moveChar(char, modX, modY) {
     var board = window.Tacticalle.board;
-    if (board.isValid(char.x + modX, char.y + modY)) {
+    var cost = board.getMoveCost(char.x + modX, char.y + modY);
+    if (char.actionPoints >= cost) {
         char.x += modX;
         char.y += modY;
+        char.actionPoints -= cost;
         board.drawFigures();
     }
 }
@@ -48,14 +50,18 @@ function moveDown(char) {
     moveChar(char, 0, 1);
 }
 function wait(char) {
-    char.actionPoints -= 10;
-    window.Tacticalle.board.nextAction();
+    if (char.actionPoints < 90) {
+        window.Tacticalle.board.nextAction();
+    } else {
+        console.log("Can't wait while your action points are greater than 90! ", char.actionPoints);
+    }
 }
 function attack() {
 }
 function skill() {
 }
-function defend() {
+function defend(char) {
+    char.actionPoints -= 10;
 }
 var $ = document.querySelector.bind(document);
 var CANVAS = $('canvas');
@@ -66,7 +72,7 @@ var Character = (function () {
         this.x = x;
         this.y = y;
         this.speed = 5;
-        this.actionPoints = 0;
+        this.actionPoints = 100;
     }
     Character.prototype.nextRound = function () {
         this.actionPoints += this.speed;
@@ -87,7 +93,6 @@ var Board = (function () {
         this.chars.sort(function (a, b) {
             return b.actionPoints - a.actionPoints;
         });
-        console.log(this.chars);
     };
     Board.prototype.currentChar = function () {
         return this.chars[0];
@@ -98,21 +103,32 @@ var Board = (function () {
     };
 
     Board.prototype.nextAction = function () {
-        this.chars.forEach(function (currentChar) {
-            currentChar.nextRound();
-        });
-        this.sortChars();
+        while (this.chars[0].actionPoints < 90) {
+            this.chars.forEach(function (currentChar) {
+                currentChar.nextRound();
+            });
+            this.sortChars();
+        }
+        this.drawFigures();
     };
 
-    Board.prototype.isValid = function (x, y) {
+    Board.prototype.getMoveCost = function (x, y) {
         var takenByChar = this.chars.some(function (currentChar) {
             return currentChar.x === x && currentChar.y === y;
         });
-        return !takenByChar && x >= 0 && x < this.width && y >= 0 && y < this.height;
+        if (takenByChar || x < 0 || x > this.width || y < 0 || y > this.height) {
+            return Number.POSITIVE_INFINITY;
+        } else {
+            return 10;
+        }
     };
 
-    Board.prototype.drawFigure = function (currentChar) {
-        CONTEXT.fillStyle = 'black';
+    Board.prototype.drawFigure = function (currentChar, index) {
+        if (index) {
+            CONTEXT.fillStyle = 'black';
+        } else {
+            CONTEXT.fillStyle = 'red';
+        }
         CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50);
     };
 
