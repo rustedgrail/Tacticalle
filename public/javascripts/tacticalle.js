@@ -28,10 +28,11 @@ function handleKeyEvent(e) {
 
 function moveChar(char, modX, modY) {
     var board = window.Tacticalle.board;
-    char.x = Math.max(0, Math.min(board.width, char.x + modX));
-    char.y = Math.max(0, Math.min(board.height, char.y + modY));
-    board.drawBackground();
-    board.drawFigure(char);
+    if (board.isValid(char.x + modX, char.y + modY)) {
+        char.x += modX;
+        char.y += modY;
+        board.drawFigures();
+    }
 }
 
 function moveLeft(char) {
@@ -73,8 +74,8 @@ var Character = (function () {
 var Board = (function () {
     function Board() {
         this.chars = [];
-        this.width = 1200 / 50 - 1;
-        this.height = (600 - 200) / 50 - 1;
+        this.width = 1200 / 50;
+        this.height = (600 - 200) / 50;
     }
     Board.prototype.addChar = function (newChar) {
         this.chars.push(newChar);
@@ -90,6 +91,13 @@ var Board = (function () {
     Board.prototype.getChars = function () {
         this.sortChars();
         return this.chars;
+    };
+
+    Board.prototype.isValid = function (x, y) {
+        var takenByChar = this.chars.some(function (currentChar) {
+            return currentChar.x === x && currentChar.y === y;
+        });
+        return !takenByChar && x >= 0 && x < this.width && y >= 0 && y < this.height;
     };
 
     Board.prototype.drawFigure = function (currentChar) {
@@ -115,10 +123,10 @@ initializeBoard();
 
 function initializeBoard() {
     window.Tacticalle = {};
-    var char = new Character(1, 1);
     var board = new Board();
     window.Tacticalle.board = board;
-    board.addChar(char);
+    board.addChar(new Character(1, 1));
+    board.addChar(new Character(22, 1));
     board.drawFigures();
     attachEvents();
 }

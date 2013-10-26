@@ -29,10 +29,11 @@ function handleKeyEvent(e) {
 
 function moveChar(char: Character, modX: number, modY: number) {
     var board = window.Tacticalle.board
-    char.x = Math.max(0, Math.min(board.width, char.x + modX))
-    char.y = Math.max(0, Math.min(board.height, char.y + modY))
-    board.drawBackground()
-    board.drawFigure(char)
+    if (board.isValid(char.x + modX, char.y + modY)) {
+        char.x += modX
+        char.y += modY
+        board.drawFigures()
+    }
 }
 
 function moveLeft(char: Character) { moveChar(char, -1, 0) }

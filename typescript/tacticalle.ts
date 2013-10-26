@@ -29,8 +29,8 @@ class Character {
 
 class Board {
     private chars: Array<Character> = []
-    private width: number = 1200 / 50 - 1
-    private height: number = (600 - 200) / 50 - 1
+    private width: number = 1200 / 50
+    private height: number = (600 - 200) / 50
     addChar(newChar: Character) {
         this.chars.push(newChar)
     }
@@ -45,6 +45,13 @@ class Board {
     getChars() {
         this.sortChars()
         return this.chars
+    }
+    
+    isValid(x, y) {
+        var takenByChar = this.chars.some(function(currentChar) {
+            return currentChar.x === x && currentChar.y === y
+        })
+        return !takenByChar && x >= 0 && x < this.width && y >= 0 && y < this.height
     }
     
     drawFigure(currentChar: Character) {
@@ -69,10 +76,10 @@ initializeBoard()
 
 function initializeBoard() {
     window.Tacticalle = {}
-    var char: Character = new Character(1, 1);
     var board = new Board()
     window.Tacticalle.board = board
-    board.addChar(char)
+    board.addChar(new Character(1, 1))
+    board.addChar(new Character(22, 1))
     board.drawFigures()
     attachEvents()
 }
