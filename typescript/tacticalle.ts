@@ -9,7 +9,7 @@ var CONTEXT = CANVAS.getContext('2d')
 class Character {
     public hp: number
     public mp: number
-    public speed: number
+    public speed: number = 5
     public attack: number
     public defence: number
     public magic: number
@@ -36,8 +36,9 @@ class Board {
     }
     sortChars() {
         this.chars.sort(function(a, b) {
-            return a.actionPoints - b.actionPoints
+            return b.actionPoints - a.actionPoints
         })
+        console.log(this.chars)
     }
     currentChar() {
         return this.chars[0]
@@ -45,6 +46,13 @@ class Board {
     getChars() {
         this.sortChars()
         return this.chars
+    }
+    
+    nextAction() {
+        this.chars.forEach(function(currentChar: Character) {
+            currentChar.nextRound()
+        })
+        this.sortChars()
     }
     
     isValid(x, y) {

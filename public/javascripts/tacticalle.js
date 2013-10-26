@@ -47,7 +47,9 @@ function moveUp(char) {
 function moveDown(char) {
     moveChar(char, 0, 1);
 }
-function wait() {
+function wait(char) {
+    char.actionPoints -= 10;
+    window.Tacticalle.board.nextAction();
 }
 function attack() {
 }
@@ -63,6 +65,7 @@ var Character = (function () {
     function Character(x, y) {
         this.x = x;
         this.y = y;
+        this.speed = 5;
         this.actionPoints = 0;
     }
     Character.prototype.nextRound = function () {
@@ -82,8 +85,9 @@ var Board = (function () {
     };
     Board.prototype.sortChars = function () {
         this.chars.sort(function (a, b) {
-            return a.actionPoints - b.actionPoints;
+            return b.actionPoints - a.actionPoints;
         });
+        console.log(this.chars);
     };
     Board.prototype.currentChar = function () {
         return this.chars[0];
@@ -91,6 +95,13 @@ var Board = (function () {
     Board.prototype.getChars = function () {
         this.sortChars();
         return this.chars;
+    };
+
+    Board.prototype.nextAction = function () {
+        this.chars.forEach(function (currentChar) {
+            currentChar.nextRound();
+        });
+        this.sortChars();
     };
 
     Board.prototype.isValid = function (x, y) {

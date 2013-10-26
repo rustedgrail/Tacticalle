@@ -40,7 +40,10 @@ function moveLeft(char: Character) { moveChar(char, -1, 0) }
 function moveRight(char: Character) { moveChar(char, 1, 0) }
 function moveUp(char: Character) { moveChar(char, 0, -1) }
 function moveDown(char: Character) { moveChar(char, 0, 1) }
-function wait() {}
+function wait(char: Character) {
+    char.actionPoints -= 10
+    window.Tacticalle.board.nextAction()
+}
 function attack() {}
 function skill() {}
 function defend() {}
