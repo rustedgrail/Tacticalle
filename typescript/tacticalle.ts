@@ -7,11 +7,11 @@ var CANVAS = $('canvas')
 var CONTEXT = CANVAS.getContext('2d')
 
 class Character {
-    public hp: number
+    public hp: number = 100
     public mp: number
     public speed: number = 5
-    public attack: number
-    public defence: number
+    public attack: number = 2
+    public defense: number = 1
     public magic: number
     public magicDefence: number
     public critical: number
@@ -77,6 +77,12 @@ class Board {
             CONTEXT.fillStyle = 'black'
         }
         else {
+            CONTEXT.fillStyle = 'black'
+            CONTEXT.font = "20px Helvetica"
+            CONTEXT.fillText('HP: ' + currentChar.hp, 15, 20)
+            CONTEXT.fillText('ATK: ' + currentChar.attack, 15, 40)
+            CONTEXT.fillText('DEF: ' + currentChar.defense, 15, 60)
+            CONTEXT.fillText('AP: ' + currentChar.actionPoints, 15, 80)
             CONTEXT.fillStyle = 'red'
         }
         CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50)

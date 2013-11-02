@@ -54,4 +54,5 @@ function attack() {}
 function skill() {}
 function defend(char: Character) {
     char.actionPoints -= 10
+    char.defense += 1
 }

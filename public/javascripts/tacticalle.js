@@ -62,6 +62,7 @@ function skill() {
 }
 function defend(char) {
     char.actionPoints -= 10;
+    char.defense += 1;
 }
 var $ = document.querySelector.bind(document);
 var CANVAS = $('canvas');
@@ -71,7 +72,10 @@ var Character = (function () {
     function Character(x, y) {
         this.x = x;
         this.y = y;
+        this.hp = 100;
         this.speed = 5;
+        this.attack = 2;
+        this.defense = 1;
         this.actionPoints = 100;
     }
     Character.prototype.nextRound = function () {
@@ -103,7 +107,7 @@ var Board = (function () {
     };
 
     Board.prototype.nextAction = function () {
-        while (this.chars[0].actionPoints < 90) {
+        while (this.chars[0].actionPoints < 100) {
             this.chars.forEach(function (currentChar) {
                 currentChar.nextRound();
             });
@@ -127,6 +131,12 @@ var Board = (function () {
         if (index) {
             CONTEXT.fillStyle = 'black';
         } else {
+            CONTEXT.fillStyle = 'black';
+            CONTEXT.font = "20px Helvetica";
+            CONTEXT.fillText('HP: ' + currentChar.hp, 15, 20);
+            CONTEXT.fillText('ATK: ' + currentChar.attack, 15, 40);
+            CONTEXT.fillText('DEF: ' + currentChar.defense, 15, 60);
+            CONTEXT.fillText('AP: ' + currentChar.actionPoints, 15, 80);
             CONTEXT.fillStyle = 'red';
         }
         CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50);
