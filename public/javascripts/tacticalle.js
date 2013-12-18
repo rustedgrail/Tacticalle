@@ -5,6 +5,12 @@ function attachEvents() {
     document.body.addEventListener('keydown', handleKeyPress);
 }
 
+var DEFAULT = "DEFAULT";
+var ATTACK = "ATTACK";
+var MOVE = "MOVE";
+
+var currentState = MOVE;
+
 var keyBindings = {
     37: moveLeft,
     38: moveUp,
@@ -15,15 +21,38 @@ var keyBindings = {
     83: skill,
     87: wait
 };
+keyBindings[DEFAULT] = function () {
+    console.log("Use arrow keys to move");
+    console.log("W for wait");
+    console.log("A for attack");
+    console.log("S for skills");
+    console.log("D for defend");
+};
+
+var stateMachine = {};
+stateMachine[MOVE] = keyBindings;
+stateMachine[ATTACK] = {
+    37: attackLeft,
+    38: attackUp,
+    39: attackRight,
+    40: attackDown
+};
+stateMachine[ATTACK][DEFAULT] = function () {
+    currentState = MOVE;
+};
+
 function handleKeyPress(e) {
-    if (typeof keyBindings[e.keyCode] === 'function')
+    if (typeof stateMachine[currentState][e.keyCode] === "function") {
         handleKeyEvent(e);
+    } else {
+        stateMachine[currentState][DEFAULT]();
+    }
 }
 
 function handleKeyEvent(e) {
     var board = window.Tacticalle.board;
     var char = board.currentChar();
-    RAF(keyBindings[e.keyCode].bind(null, char, e));
+    RAF(stateMachine[currentState][e.keyCode].bind(null, char, e));
 }
 
 function moveChar(char, modX, modY) {
@@ -56,7 +85,35 @@ function wait(char) {
         console.log("Can't wait while your action points are greater than 90! ", char.actionPoints);
     }
 }
-function attack() {
+
+function attack(char) {
+    if (char.actionPoints >= char.attackCost) {
+        currentState = ATTACK;
+    }
+}
+
+function attackDir(char, modX, modY) {
+    var board = window.Tacticalle.board;
+    var defender = board.getCharAt(char.x + modX, char.y + modY);
+    if (defender) {
+        char.actionPoints -= char.attackCost;
+        defender.hp -= Math.max(0, char.attack - defender.defense);
+        defender.defense -= char.attack;
+    }
+    currentState = MOVE;
+    window.Tacticalle.board.drawFigures();
+}
+function attackLeft(char) {
+    attackDir(char, -1, 0);
+}
+function attackRight(char) {
+    attackDir(char, 1, 0);
+}
+function attackUp(char) {
+    attackDir(char, 0, -1);
+}
+function attackDown(char) {
+    attackDir(char, 0, 1);
 }
 function skill() {
 }
@@ -76,6 +133,7 @@ var Character = (function () {
         this.speed = 5;
         this.attack = 2;
         this.defense = 1;
+        this.attackCost = 30;
         this.actionPoints = 100;
     }
     Character.prototype.nextRound = function () {
@@ -104,6 +162,11 @@ var Board = (function () {
     Board.prototype.getChars = function () {
         this.sortChars();
         return this.chars;
+    };
+    Board.prototype.getCharAt = function (x, y) {
+        return this.chars.find(function (c) {
+            return c.x === x && c.y === y;
+        });
     };
 
     Board.prototype.nextAction = function () {
@@ -167,4 +230,3 @@ function initializeBoard() {
     board.drawFigures();
     attachEvents();
 }
-//# sourceMappingURL=tacticalle.js.map

@@ -17,6 +17,7 @@ class Character {
     public critical: number
     public fumble: number
     public actionPoints: number
+    public attackCost: number = 30
     
     constructor(public x: number, public y: number) {
         this.actionPoints = 100
@@ -45,6 +46,11 @@ class Board {
     getChars() {
         this.sortChars()
         return this.chars
+    }
+    getCharAt(x: number, y: number) {
+        return this.chars.find(function(c) {
+            return c.x === x && c.y === y
+        })
     }
     
     nextAction() {
