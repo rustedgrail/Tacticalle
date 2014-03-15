@@ -231,6 +231,9 @@ function attackDown(char) {
 function skill() {
 }
 function defend(char) {
-    char.actionPoints -= 10;
-    char.defense += 1;
+    if (char.actionPoints >= 10) {
+        char.actionPoints -= 10;
+        char.defense += 1;
+        window.Tacticalle.board.drawFigures();
+    }
 }

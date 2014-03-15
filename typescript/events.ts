@@ -103,6 +103,9 @@ function attackUp(char: Character) { attackDir(char, 0, -1) }
 function attackDown(char: Character) { attackDir(char, 0, 1) }
 function skill() {}
 function defend(char: Character) {
+  if(char.actionPoints >= 10) {
     char.actionPoints -= 10
     char.defense += 1
+    window.Tacticalle.board.drawFigures()
+  }
 }
