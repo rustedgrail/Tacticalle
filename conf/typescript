@@ -1,1 +1,1 @@
---out public/javascripts/tacticalle.js --allowbool -t ES5
+--out public/javascripts/tacticalle.js -t ES5 -w

@@ -2,6 +2,10 @@ interface Window {
     Tacticalle: any
 }
 
+interface Array {
+    find: any
+}
+
 var $ = document.querySelector.bind(document)
 var CANVAS = $('canvas')
 var CONTEXT = CANVAS.getContext('2d')
@@ -18,11 +22,11 @@ class Character {
     public fumble: number
     public actionPoints: number
     public attackCost: number = 30
-    
-    constructor(public x: number, public y: number) {
+
+    constructor(public x: number, public y: number, public team: String) {
         this.actionPoints = 100
     }
-    
+
     nextRound() {
         this.actionPoints += this.speed
     }
@@ -52,7 +56,7 @@ class Board {
             return c.x === x && c.y === y
         })
     }
-    
+
     nextAction() {
         while (this.chars[0].actionPoints < 100) {
             this.chars.forEach(function(currentChar: Character) {
@@ -62,7 +66,7 @@ class Board {
         }
         this.drawFigures()
     }
-    
+
     getMoveCost(x, y) {
         var takenByChar = this.chars.some(function(currentChar) {
             return currentChar.x === x && currentChar.y === y
@@ -77,10 +81,10 @@ class Board {
             return 10;
         }
     }
-    
+
     drawFigure(currentChar: Character, index: number) {
         if (index) {
-            CONTEXT.fillStyle = 'black'
+            CONTEXT.fillStyle = currentChar.team
         }
         else {
             CONTEXT.fillStyle = 'black'
@@ -89,11 +93,10 @@ class Board {
             CONTEXT.fillText('ATK: ' + currentChar.attack, 15, 40)
             CONTEXT.fillText('DEF: ' + currentChar.defense, 15, 60)
             CONTEXT.fillText('AP: ' + currentChar.actionPoints, 15, 80)
-            CONTEXT.fillStyle = 'red'
         }
         CONTEXT.fillRect(currentChar.x * 50, currentChar.y * 50 + 200, 50, 50)
     }
-    
+
     drawFigures() {
         this.drawBackground()
         this.chars.forEach(this.drawFigure)
@@ -113,8 +116,12 @@ function initializeBoard() {
     window.Tacticalle = {}
     var board = new Board()
     window.Tacticalle.board = board
-    board.addChar(new Character(1, 1))
-    board.addChar(new Character(22, 1))
+    board.addChar(new Character(1, 1, "red"))
+    board.addChar(new Character(1, 3, "red"))
+    board.addChar(new Character(1, 5, "red"))
+    board.addChar(new Character(22, 1, "blue"))
+    board.addChar(new Character(22, 3, "blue"))
+    board.addChar(new Character(22, 5, "blue"))
     board.drawFigures()
     attachEvents()
 }

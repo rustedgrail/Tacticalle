@@ -1,8 +1,8 @@
-///<reference path='tacticalle.s'>
+/// <reference path="tacticalle.ts"/>
 var RAF = requestAnimationFrame.bind(window);
 
 function attachEvents() {
-    document.body.addEventListener('keydown', handleKeyPress)    
+    document.body.addEventListener('keydown', handleKeyPress)
 }
 
 var DEFAULT = "DEFAULT"
@@ -89,7 +89,7 @@ function attack(char: Character) {
 function attackDir(char: Character, modX: number, modY: number) {
     var board = window.Tacticalle.board
     var defender = board.getCharAt(char.x + modX, char.y + modY)
-    if (defender) {
+    if (defender && char.team != defender.team) {
         char.actionPoints -= char.attackCost
         defender.hp -= Math.max(0, char.attack - defender.defense)
         defender.defense -= char.attack

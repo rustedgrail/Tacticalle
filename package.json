@@ -1,6 +1,7 @@
 {
   "name": "Tacticalle",
   "version": "0.0.1",
+  "repository": "https://github.com/rustedgrail/Tacticalle.git",
   "scripts": {
     "start": "node app.js"
   },
