@@ -1,8 +1,37 @@
 /// <reference path="tacticalle.ts"/>
-var RAF = requestAnimationFrame.bind(window);
+interface Event {
+  gamepad: any
+}
+
+interface Gamepad {
+  buttons: any
+}
+
+var RAF = requestAnimationFrame.bind(window)
+RAF(updateController)
 
 function attachEvents() {
-    document.body.addEventListener('keydown', handleKeyPress)
+  document.body.addEventListener('keydown', handleKeyPress)
+}
+
+function scangamepads() {
+  var gamepads = navigator.webkitGetGamepads();
+  if (gamepads[0]) {
+    window.Tacticalle.controller = gamepads[0]
+  }
+}
+
+function updateController() {
+  scangamepads()
+  var controller
+  if (controller = window.Tacticalle.controller) {
+    controller.buttons.forEach(function(buttonValue, index) {
+      if (buttonValue > 0) {
+        console.log("PRESSED: ", index)
+      }
+    })
+  }
+  RAF(updateController)
 }
 
 var DEFAULT = "DEFAULT"
@@ -12,7 +41,7 @@ var MOVE = "MOVE"
 var currentState = MOVE
 
 var keyBindings = {
-    37: moveLeft
+  37: moveLeft
     , 38: moveUp
     , 39: moveRight
     , 40: moveDown
@@ -22,7 +51,7 @@ var keyBindings = {
     , 87: wait
 }
 keyBindings[DEFAULT] = function() {
-    console.log("Use arrow keys to move")
+  console.log("Use arrow keys to move")
     console.log("W for wait")
     console.log("A for attack")
     console.log("S for skills")
@@ -32,35 +61,35 @@ keyBindings[DEFAULT] = function() {
 var stateMachine = {}
 stateMachine[MOVE] = keyBindings
 stateMachine[ATTACK] = {
-    37: attackLeft
+  37: attackLeft
     , 38: attackUp
     , 39: attackRight
     , 40: attackDown
 }
 stateMachine[ATTACK][DEFAULT] = function() {
-    currentState = MOVE
+  currentState = MOVE
 }
 
 function handleKeyPress(e) {
-    if (typeof stateMachine[currentState][e.keyCode] === "function") {
-        handleKeyEvent(e)
-    }
-    else {
-        stateMachine[currentState][DEFAULT]()
-    }
+  if (typeof stateMachine[currentState][e.keyCode] === "function") {
+    handleKeyEvent(e)
+  }
+  else {
+    stateMachine[currentState][DEFAULT]()
+  }
 }
 
 function handleKeyEvent(e) {
-    var board = window.Tacticalle.board
+  var board = window.Tacticalle.board
     var char = board.currentChar();
-    RAF(stateMachine[currentState][e.keyCode].bind(null, char, e))
+  RAF(stateMachine[currentState][e.keyCode].bind(null, char, e))
 }
 
 function moveChar(char: Character, modX: number, modY: number) {
-    var board = window.Tacticalle.board
+  var board = window.Tacticalle.board
     var cost = board.getMoveCost(char.x + modX, char.y + modY)
     if (char.actionPoints >= cost) {
-        char.x += modX
+      char.x += modX
         char.y += modY
         char.actionPoints -= cost
         board.drawFigures()
@@ -72,29 +101,29 @@ function moveRight(char: Character) { moveChar(char, 1, 0) }
 function moveUp(char: Character) { moveChar(char, 0, -1) }
 function moveDown(char: Character) { moveChar(char, 0, 1) }
 function wait(char: Character) {
-    if (char.actionPoints < 90) {
-        window.Tacticalle.board.nextAction()
-    }
-    else {
-        console.log("Can't wait while your action points are greater than 90! ", char.actionPoints)
-    }
+  if (char.actionPoints < 90) {
+    window.Tacticalle.board.nextAction()
+  }
+  else {
+    console.log("Can't wait while your action points are greater than 90! ", char.actionPoints)
+  }
 }
 
 function attack(char: Character) {
-    if (char.actionPoints >= char.attackCost) {
-        currentState = ATTACK;
-    }
+  if (char.actionPoints >= char.attackCost) {
+    currentState = ATTACK;
+  }
 }
 
 function attackDir(char: Character, modX: number, modY: number) {
-    var board = window.Tacticalle.board
+  var board = window.Tacticalle.board
     var defender = board.getCharAt(char.x + modX, char.y + modY)
     if (defender && char.team != defender.team) {
-        char.actionPoints -= char.attackCost
+      char.actionPoints -= char.attackCost
         defender.hp -= Math.max(0, char.attack - defender.defense)
         defender.defense -= char.attack
     }
-    currentState = MOVE
+  currentState = MOVE
     window.Tacticalle.board.drawFigures()
 }
 function attackLeft(char: Character) { attackDir(char, -1, 0) }
@@ -105,7 +134,7 @@ function skill() {}
 function defend(char: Character) {
   if(char.actionPoints >= 10) {
     char.actionPoints -= 10
-    char.defense += 1
-    window.Tacticalle.board.drawFigures()
+      char.defense += 1
+      window.Tacticalle.board.drawFigures()
   }
 }

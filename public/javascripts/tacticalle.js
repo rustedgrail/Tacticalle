@@ -112,10 +112,32 @@ function initializeBoard() {
     attachEvents();
 }
 /// <reference path="tacticalle.ts"/>
+
 var RAF = requestAnimationFrame.bind(window);
+RAF(updateController);
 
 function attachEvents() {
     document.body.addEventListener('keydown', handleKeyPress);
+}
+
+function scangamepads() {
+    var gamepads = navigator.webkitGetGamepads();
+    if (gamepads[0]) {
+        window.Tacticalle.controller = gamepads[0];
+    }
+}
+
+function updateController() {
+    scangamepads();
+    var controller;
+    if (controller = window.Tacticalle.controller) {
+        controller.buttons.forEach(function (buttonValue, index) {
+            if (buttonValue > 0) {
+                console.log("PRESSED: ", index);
+            }
+        });
+    }
+    RAF(updateController);
 }
 
 var DEFAULT = "DEFAULT";

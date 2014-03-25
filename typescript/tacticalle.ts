@@ -2,6 +2,10 @@ interface Window {
     Tacticalle: any
 }
 
+interface Navigator {
+  webkitGetGamepads: any
+}
+
 interface Array {
     find: any
 }
