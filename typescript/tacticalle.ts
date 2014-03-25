@@ -8,6 +8,7 @@ interface Navigator {
 
 interface Array {
     find: any
+    gimme: any
 }
 
 var $ = document.querySelector.bind(document)
@@ -56,7 +57,7 @@ class Board {
         return this.chars
     }
     getCharAt(x: number, y: number) {
-        return this.chars.find(function(c) {
+        return this.chars.gimme(function(c) {
             return c.x === x && c.y === y
         })
     }

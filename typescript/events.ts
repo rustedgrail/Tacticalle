@@ -7,6 +7,19 @@ interface Gamepad {
   buttons: any
 }
 
+Array.prototype.gimme = function(func) {
+  if (Array.prototype.find) {
+    return this.find(func)
+  }
+  else {
+    var retVal
+    this.forEach(function(val) {
+      if (func(val)) retVal = val
+    });
+    return retVal
+  }
+}
+
 var RAF = requestAnimationFrame.bind(window)
 RAF(updateController)
 
@@ -23,14 +36,20 @@ function scangamepads() {
 
 function updateController() {
   scangamepads()
-  var controller
-  if (controller = window.Tacticalle.controller) {
-    controller.buttons.forEach(function(buttonValue, index) {
-      if (buttonValue > 0) {
-        console.log("PRESSED: ", index)
-      }
-    })
+  var board = window.Tacticalle.board
+  var char = board.currentChar()
+  var controller = window.Tacticalle.controller
+  if (controller) {
+    if (controller.buttons[2])     handleKeyPress({keyCode: 65})
+    if (controller.buttons[3])     handleKeyPress({keyCode: 87})
+    if (controller.buttons[1])     handleKeyPress({keyCode: 68})
+
+    if (controller.axes[0] > .5)   handleKeyPress({keyCode: 39})
+    if (controller.axes[0] < -.5)  handleKeyPress({keyCode: 37})
+    if (controller.axes[1] > .5)   handleKeyPress({keyCode: 40})
+    if (controller.axes[1] < -.5)  handleKeyPress({keyCode: 38})
   }
+
   RAF(updateController)
 }
 
@@ -70,30 +89,35 @@ stateMachine[ATTACK][DEFAULT] = function() {
   currentState = MOVE
 }
 
+var timeout = null
 function handleKeyPress(e) {
+  if (!timeout) {
   if (typeof stateMachine[currentState][e.keyCode] === "function") {
     handleKeyEvent(e)
   }
   else {
     stateMachine[currentState][DEFAULT]()
   }
+  }
+
+  timeout = setTimeout(function() { timeout = false }, 150)
 }
 
 function handleKeyEvent(e) {
   var board = window.Tacticalle.board
-    var char = board.currentChar();
+  var char = board.currentChar()
   RAF(stateMachine[currentState][e.keyCode].bind(null, char, e))
 }
 
 function moveChar(char: Character, modX: number, modY: number) {
   var board = window.Tacticalle.board
-    var cost = board.getMoveCost(char.x + modX, char.y + modY)
-    if (char.actionPoints >= cost) {
-      char.x += modX
-        char.y += modY
-        char.actionPoints -= cost
-        board.drawFigures()
-    }
+  var cost = board.getMoveCost(char.x + modX, char.y + modY)
+  if (char.actionPoints >= cost) {
+    char.x += modX
+      char.y += modY
+      char.actionPoints -= cost
+      board.drawFigures()
+  }
 }
 
 function moveLeft(char: Character) { moveChar(char, -1, 0) }
