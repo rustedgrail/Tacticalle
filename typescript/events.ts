@@ -145,6 +145,7 @@ function attackDir(char: Character, modX: number, modY: number) {
     if (defender && char.team != defender.team) {
       char.actionPoints -= char.attackCost
         defender.hp -= Math.max(0, char.attack - defender.defense)
+        if (defender.hp <= 0) board.removeChar(defender)
         defender.defense -= char.attack
     }
   currentState = MOVE

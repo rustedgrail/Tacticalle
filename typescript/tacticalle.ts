@@ -19,7 +19,7 @@ class Character {
     public hp: number = 100
     public mp: number
     public speed: number = 5
-    public attack: number = 2
+    public attack: number = 200
     public defense: number = 1
     public magic: number
     public magicDefence: number
@@ -60,6 +60,26 @@ class Board {
         return this.chars.gimme(function(c) {
             return c.x === x && c.y === y
         })
+    }
+
+    removeChar(char: Character) {
+      this.chars.splice(this.chars.indexOf(char), 1)
+      this.checkVictory()
+    }
+
+    checkVictory() {
+      var team = this.chars[0].team
+      var finished = true
+      this.chars.forEach(function(char) {
+        finished = finished && !(char.team != team)
+      });
+      if (finished) {
+        this.endGame()
+      }
+    }
+
+    endGame() {
+      document.write("THE GAME IS OVER!!")
     }
 
     nextAction() {

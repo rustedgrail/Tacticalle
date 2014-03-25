@@ -9,7 +9,7 @@ var Character = (function () {
         this.team = team;
         this.hp = 100;
         this.speed = 5;
-        this.attack = 2;
+        this.attack = 200;
         this.defense = 1;
         this.attackCost = 30;
         this.actionPoints = 100;
@@ -45,6 +45,26 @@ var Board = (function () {
         return this.chars.gimme(function (c) {
             return c.x === x && c.y === y;
         });
+    };
+
+    Board.prototype.removeChar = function (char) {
+        this.chars.splice(this.chars.indexOf(char), 1);
+        this.checkVictory();
+    };
+
+    Board.prototype.checkVictory = function () {
+        var team = this.chars[0].team;
+        var finished = true;
+        this.chars.forEach(function (char) {
+            finished = finished && !(char.team != team);
+        });
+        if (finished) {
+            this.endGame();
+        }
+    };
+
+    Board.prototype.endGame = function () {
+        document.write("THE GAME IS OVER!!");
     };
 
     Board.prototype.nextAction = function () {
@@ -266,6 +286,8 @@ function attackDir(char, modX, modY) {
     if (defender && char.team != defender.team) {
         char.actionPoints -= char.attackCost;
         defender.hp -= Math.max(0, char.attack - defender.defense);
+        if (defender.hp <= 0)
+            board.removeChar(defender);
         defender.defense -= char.attack;
     }
     currentState = MOVE;
